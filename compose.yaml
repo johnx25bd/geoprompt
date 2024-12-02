@@ -1,0 +1,62 @@
+services:
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: api/Dockerfile
+  #   volumes:
+  #     - ./cache:/root/.cache/torch
+  #     - ./cache/huggingface:/root/.cache/huggingface
+  #   image: mlx-deploy-search-api
+  #   environment:
+  #     - DATABASE_URL=postgres://logger:secure_password@postgres:5432/user_logs
+  #   ports:
+  #     - "8000:8000"
+
+  # front:
+  #   build: ./front
+  #   image: mlx-deploy-search-front
+  #   environment:
+  #     - API_HOST=api
+  #     - API_PORT=8000
+  #   ports:
+  #     - "8501:8501"
+  #   depends_on:
+  #     - api
+  #   security_opt:
+  #     - seccomp:unconfined
+
+  # nginx:
+  #   build: ./nginx
+  #   image: nginx:latest
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     - api
+  #     - front
+
+  postgis:
+    build: 
+      context: ./postgis
+      platforms:
+        - linux/arm64
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=mapper
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=overture
+      - POSTGRES_HOST_AUTH_METHOD=trust # Add this
+    volumes:
+      - pg_omf_data:/var/lib/postgresql/data
+      - ./postgis/data:/backup
+    user: postgres
+    command: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "mapper", "-d", "overture"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_omf_data:
+
