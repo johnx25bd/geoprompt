@@ -1,0 +1,8 @@
+
+data/*.json
+*.dump
+
+.DS_Store
+.ipynb_checkpoints
+
+.venv

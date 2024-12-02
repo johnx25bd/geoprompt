@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "nl-geospatial-interface"
+version = "0.1.0"
+description = "Natural language interface for geospatial databases"
+authors = ["John X <john.iv@x25bd.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ipython = "^8.30.0"
+geopandas = "^1.0.1"
+matplotlib = "^3.9.3"
+ipython-sql = "^0.5.0"
+sqlalchemy = "^2.0.36"
+psycopg2 = "^2.9.10"
+geoalchemy2 = "^0.16.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
