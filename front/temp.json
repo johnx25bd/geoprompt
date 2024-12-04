@@ -1,0 +1,651 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "0",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da49d33fff0200b1a3ec6aba63",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w667366337@7", "update_time": "2022-06-17T19: 19: 06.000Z", "confidence": null } ]",
+                "subtype": null,
+                "class": null,
+                "names": "{ "primary": "Embassy of the People's Republic of China", "common": [ [ "en", "Embassy of the People's Republic of China" ], [ "fr", "Ambassade de Chine" ], [ "zh", "\u4e2d\u534e\u4eba\u6c11\u5171\u548c\u56fd\u5927\u4f7f\u9986" ] ], "rules": null }",
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": null,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1462493,
+                            51.5210956
+                        ],
+                        [
+                            -0.1463972,
+                            51.521071
+                        ],
+                        [
+                            -0.146363,
+                            51.5209912
+                        ],
+                        [
+                            -0.1461749,
+                            51.521022
+                        ],
+                        [
+                            -0.1461313,
+                            51.5209136
+                        ],
+                        [
+                            -0.1456306,
+                            51.5209987
+                        ],
+                        [
+                            -0.1457104,
+                            51.5211844
+                        ],
+                        [
+                            -0.1458457,
+                            51.5211619
+                        ],
+                        [
+                            -0.1458866,
+                            51.5211552
+                        ],
+                        [
+                            -0.1459714,
+                            51.5211409
+                        ],
+                        [
+                            -0.1459582,
+                            51.5211106
+                        ],
+                        [
+                            -0.1460299,
+                            51.5210985
+                        ],
+                        [
+                            -0.1460358,
+                            51.5211121
+                        ],
+                        [
+                            -0.1461394,
+                            51.5210947
+                        ],
+                        [
+                            -0.1461327,
+                            51.5210793
+                        ],
+                        [
+                            -0.1461735,
+                            51.5210725
+                        ],
+                        [
+                            -0.1461879,
+                            51.5211059
+                        ],
+                        [
+                            -0.1462493,
+                            51.5210956
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "1",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da48a49fff020050635b8053ac",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526473@1", "update_time": "2019-02-10T15: 33: 03.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": 3.0,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1467008,
+                            51.5211956
+                        ],
+                        [
+                            -0.1467898,
+                            51.5211805
+                        ],
+                        [
+                            -0.1467612,
+                            51.5211096
+                        ],
+                        [
+                            -0.1467134,
+                            51.5211175
+                        ],
+                        [
+                            -0.1466697,
+                            51.5211245
+                        ],
+                        [
+                            -0.1467008,
+                            51.5211956
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "2",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da49d14fff0200bee19b7bb51f",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526456@3", "update_time": "2020-02-10T22: 06: 07.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": 3.0,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1465305,
+                            51.5210783
+                        ],
+                        [
+                            -0.1465576,
+                            51.5211421
+                        ],
+                        [
+                            -0.1466697,
+                            51.5211245
+                        ],
+                        [
+                            -0.1467134,
+                            51.5211175
+                        ],
+                        [
+                            -0.1466852,
+                            51.5210516
+                        ],
+                        [
+                            -0.1466332,
+                            51.5210607
+                        ],
+                        [
+                            -0.1466064,
+                            51.5210643
+                        ],
+                        [
+                            -0.1465305,
+                            51.5210783
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "3",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da48a49fff0200e76c8cc97726",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526470@1", "update_time": "2019-02-10T15: 33: 03.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": 3.0,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1468351,
+                            51.5212811
+                        ],
+                        [
+                            -0.1467898,
+                            51.5211805
+                        ],
+                        [
+                            -0.1467008,
+                            51.5211956
+                        ],
+                        [
+                            -0.1467453,
+                            51.5212967
+                        ],
+                        [
+                            -0.1468351,
+                            51.5212811
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "4",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da49d32fff0200e5b6ec044f0a",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526458@1", "update_time": "2019-02-10T15: 33: 03.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": 2.0,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1466697,
+                            51.5211245
+                        ],
+                        [
+                            -0.1465576,
+                            51.5211421
+                        ],
+                        [
+                            -0.1465912,
+                            51.5212215
+                        ],
+                        [
+                            -0.1467018,
+                            51.5212034
+                        ],
+                        [
+                            -0.1467008,
+                            51.5211956
+                        ],
+                        [
+                            -0.1466697,
+                            51.5211245
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "5",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da48a49fff0200d5761877a0f8",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526469@2", "update_time": "2020-02-10T22: 06: 07.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": 3.0,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1468795,
+                            51.5213758
+                        ],
+                        [
+                            -0.1468351,
+                            51.5212811
+                        ],
+                        [
+                            -0.1467453,
+                            51.5212967
+                        ],
+                        [
+                            -0.1467802,
+                            51.5213732
+                        ],
+                        [
+                            -0.1467889,
+                            51.5213923
+                        ],
+                        [
+                            -0.1468202,
+                            51.5213866
+                        ],
+                        [
+                            -0.1468795,
+                            51.5213758
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "6",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da49d32fff0200e1d411282d00",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526460@2", "update_time": "2020-02-10T22: 06: 07.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": 3.0,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1467018,
+                            51.5212034
+                        ],
+                        [
+                            -0.1465912,
+                            51.5212215
+                        ],
+                        [
+                            -0.1466292,
+                            51.5213178
+                        ],
+                        [
+                            -0.1467453,
+                            51.5212967
+                        ],
+                        [
+                            -0.1467018,
+                            51.5212034
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "7",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da49d32fff020016b8c87da40a",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526462@1", "update_time": "2019-02-10T15: 33: 03.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": null,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1467453,
+                            51.5212967
+                        ],
+                        [
+                            -0.1466292,
+                            51.5213178
+                        ],
+                        [
+                            -0.1466631,
+                            51.5213939
+                        ],
+                        [
+                            -0.1467802,
+                            51.5213732
+                        ],
+                        [
+                            -0.1467453,
+                            51.5212967
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "8",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da49d32fff0200f794c7c14788",
+                "version": 0,
+                "sources": "[ { "property": "", "dataset": "OpenStreetMap", "record_id": "w669526454@1", "update_time": "2019-02-10T15: 33: 03.000Z", "confidence": null } ]",
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": 4.0,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1465003,
+                            51.5213148
+                        ],
+                        [
+                            -0.1463972,
+                            51.521071
+                        ],
+                        [
+                            -0.1462493,
+                            51.5210956
+                        ],
+                        [
+                            -0.1462631,
+                            51.5211287
+                        ],
+                        [
+                            -0.1462237,
+                            51.5211351
+                        ],
+                        [
+                            -0.1462377,
+                            51.5211686
+                        ],
+                        [
+                            -0.1462824,
+                            51.5212755
+                        ],
+                        [
+                            -0.146294,
+                            51.5213031
+                        ],
+                        [
+                            -0.1463276,
+                            51.5212977
+                        ],
+                        [
+                            -0.1463452,
+                            51.5213399
+                        ],
+                        [
+                            -0.1465003,
+                            51.5213148
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "id": "9",
+            "type": "Feature",
+            "properties": {
+                "id": "08b195da49d32fff02008400bf49466c",
+                "version": 0,
+                "sources": [
+                    {
+                        "property": "x",
+                        "dataset": "OpenStreetMap",
+                        "record_id": "w669526453@1",
+                        "update_time": "2019-02-10T15:33:02.000Z",
+                        "confidence": null
+                    }
+                ],
+                "subtype": "residential",
+                "class": "residential",
+                "names": null,
+                "level": null,
+                "has_parts": false,
+                "height": null,
+                "is_underground": false,
+                "num_floors": null,
+                "min_height": null,
+                "min_floor": null,
+                "num_floors_underground": null,
+                "facade_color": null,
+                "facade_material": null,
+                "roof_material": null,
+                "roof_shape": null,
+                "roof_orientation": null,
+                "roof_color": null
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -0.1463103,
+                            51.5214391
+                        ],
+                        [
+                            -0.1465341,
+                            51.521398
+                        ],
+                        [
+                            -0.1465003,
+                            51.5213148
+                        ],
+                        [
+                            -0.1463452,
+                            51.5213399
+                        ],
+                        [
+                            -0.1462698,
+                            51.5213534
+                        ],
+                        [
+                            -0.1463103,
+                            51.5214391
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}
