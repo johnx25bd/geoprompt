@@ -1,0 +1,32 @@
+[
+    {
+        "prompt": "Find all parks within 2 kilometers of Regent's Canal."
+    },
+    {
+        "prompt": "List all buildings with more than 20 floors that are within 500 meters of the River Fleet."
+    },
+    {
+        "prompt": "Find the 10 nearest coffee shops to Battlebridge Basin."
+    },
+    {
+        "prompt": "List all restaurants that intersect with areas categorized as parks."
+    },
+    {
+        "prompt": "Show all water features that contain at least one building taller than 50 meters."
+    },
+    {
+        "prompt": "Find all buildings entirely contained within a 300-meter buffer of City Road Basin."
+    },
+    {
+        "prompt": "List all buildings where the centroid is within 2 kilometers of the River Lee."
+    },
+    {
+        "prompt": "Find the total footprint area of all buildings within 1 kilometer of Upper Pond."
+    },
+    {
+        "prompt": "List all roads that overlap with areas designated as shopping."
+    },
+    {
+        "prompt": "What is the closest hospital to Wenlock Basin?"
+    }
+]
