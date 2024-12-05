@@ -6,3 +6,7 @@ data/*.json
 .ipynb_checkpoints
 
 .venv
+
+api/data/*
+*/__pycache__/*
+*/.DS_Store
