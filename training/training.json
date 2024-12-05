@@ -1,0 +1,18 @@
+[{"prompt": "Find all buildings within 500 meters of Regent's Canal.", "completion": "SELECT id, height, num_floors FROM omf_building WHERE ST_DWithin( geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'Regent''s Canal' LIMIT 1), 500);"},
+{"prompt": "Find buildings with a footprint larger than 100 square meters.", "completion": "SELECT id, ST_Area(ST_Transform(geometry, 3857)) AS footprint_area_m2 FROM omf_building WHERE ST_Area(ST_Transform(geometry, 3857)) > 100;"},
+
+{"prompt": "Find the nearest building to Battlebridge Basin.", "completion": "SELECT id, height, num_floors, ST_Distance(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'Battlebridge Basin')) AS distance FROM omf_building ORDER BY distance LIMIT 1;"},
+
+{"prompt": "Find the average height of buildings near City Road Basin within 1 kilometer.", "completion": "SELECT AVG(height) AS average_height FROM omf_building WHERE ST_DWithin(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'City Road Basin'), 1000);"},
+
+{"prompt": "Find all places categorized as restaurants.", "completion": "SELECT id, names, geometry FROM omf_place WHERE categories::json->>'primary' = 'restaurant';"},
+
+{"prompt": "Find all buildings with more than 10 floors.", "completion": "SELECT id, height, num_floors FROM omf_building WHERE num_floors > 10;"},
+
+{"prompt": "Find the 5 closest pubs to Regent's Canal.", "completion": "SELECT id, names, ST_Distance(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'Regent\\'s Canal')) AS distance FROM omf_place WHERE categories::json->>'primary' = 'pub' ORDER BY distance LIMIT 5;"},
+
+{"prompt": "Find the average distance between all buildings and the River Fleet.", "completion": "SELECT AVG(ST_Distance(a.geometry, b.geometry)) AS average_distance FROM omf_building a, omf_water b WHERE b.names::json->>'primary' = 'River Fleet';"},
+
+{"prompt": "List all water features where the level is below sea level.", "completion": "SELECT id, names, geometry FROM omf_water WHERE level < 0;"},
+
+{"prompt": "Find all buildings near the River Lee within 2 kilometers, with at least 5 floors.", "completion": "SELECT id, height, num_floors FROM omf_building WHERE num_floors >= 5 AND ST_DWithin(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'River Lee'), 2000);"}]
