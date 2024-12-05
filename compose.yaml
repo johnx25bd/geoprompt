@@ -1,29 +1,32 @@
 services:
-  # api:
-  #   build:
-  #     context: .
-  #     dockerfile: api/Dockerfile
-  #   volumes:
-  #     - ./cache:/root/.cache/torch
-  #     - ./cache/huggingface:/root/.cache/huggingface
-  #   image: mlx-deploy-search-api
-  #   environment:
-  #     - DATABASE_URL=postgres://logger:secure_password@postgres:5432/user_logs
-  #   ports:
-  #     - "8000:8000"
+  api:
+    build: ./api
+    # image: geoprompt-api
+    # environment:
+    #   - DATABASE_URL=postgres://mapper:password@postgis:5432/overture
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgis:
+        condition: service_healthy
+    networks:
+      - app_network
 
-  # front:
-  #   build: ./front
-  #   image: mlx-deploy-search-front
-  #   environment:
-  #     - API_HOST=api
-  #     - API_PORT=8000
-  #   ports:
-  #     - "8501:8501"
-  #   depends_on:
-  #     - api
-  #   security_opt:
-  #     - seccomp:unconfined
+
+  front:
+    build: ./front
+    # image: geoprompt-front
+    environment:
+      - API_HOST=api
+      - API_PORT=8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    security_opt:
+      - seccomp:unconfined
+    networks:
+      - app_network
 
   # nginx:
   #   build: ./nginx
@@ -40,12 +43,14 @@ services:
       platforms:
         - linux/arm64
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    networks:
+      - app_network
     environment:
       - POSTGRES_USER=mapper
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=overture
-      - POSTGRES_HOST_AUTH_METHOD=trust # Add this
+      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - pg_omf_data:/var/lib/postgresql/data
       - ./postgis/data:/backup
@@ -60,3 +65,6 @@ services:
 volumes:
   pg_omf_data:
 
+networks:
+  app_network:
+    driver: bridge

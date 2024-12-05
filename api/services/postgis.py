@@ -2,15 +2,15 @@
 from sqlalchemy import create_engine, text
 import json
 # Get API details from environment variables, with defaults
-API_HOST = "0.0.0.0" #os.getenv("API_HOST", "api")  # Default to 'api' for Docker
+API_HOST = "api" #os.getenv("API_HOST", "api")  # Default to 'api' for Docker
 API_PORT = "8000" #os.getenv("API_PORT", "8000")
 API_URL = f"http://{API_HOST}:{API_PORT}"
 
 
+POSTGRES_HOST = "postgis" #os.getenv("POSTGRES_HOST")
+POSTGRES_PORT = "5432" #os.getenv("POSTGRES_PORT")
 POSTGRES_USER = "mapper" #"os.getenv("POSTGRES_USER")"
 POSTGRES_PASSWORD = "password" #os.getenv("POSTGRES_PASSWORD")
-POSTGRES_HOST = "localhost" #os.getenv("POSTGRES_HOST")
-POSTGRES_PORT = "5433" #os.getenv("POSTGRES_PORT")
 POSTGRES_DB = "overture" #os.getenv("POSTGRES_DB")
 
 
