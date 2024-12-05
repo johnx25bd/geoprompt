@@ -4,6 +4,7 @@ import streamlit as st
 import geopandas as gpd
 import folium
 from streamlit_folium import st_folium
+from streamlit_monaco import st_monaco
 
 # Setup and config variables
 st.set_page_config(layout="wide")
@@ -54,7 +55,16 @@ with col1:
 
     with query_display:
         if st.session_state.query:
-            st.write(f"Query returned for {prompt}: `{st.session_state.query}`")
+            st.write(f"Query returned:")
+            # Display the query in an editable text area
+            updated_query = st_monaco(
+                value=st.session_state.query,
+                height=300,
+                language="sql",
+                theme="vs-dark",
+            )
+            if updated_query:
+                st.session_state.query = updated_query
 
 
     # add a button to run the query

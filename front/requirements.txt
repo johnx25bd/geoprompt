@@ -5,3 +5,4 @@ geopandas==1.0.1
 folium==0.14.0
 streamlit
 streamlit-folium==0.23.2
+streamlit-monaco==0.1.3
