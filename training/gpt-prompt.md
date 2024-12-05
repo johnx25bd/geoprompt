@@ -303,6 +303,85 @@ omf_place:
                 graphic_designer: 150
                 ... there are many more categories
 
+
+Here are some things to watch out for:
+- We marked which columns have a json object as the value — here you will need to use the json functions to access the values, like `::json->>'primary'`
+- SRID is 4326 — this means that all geometries are in EPSG:4326. Units are degrees. If you need to transform to measure distance in meters (recommended, when relevant), use `ST_Transform(geometry, 3857)`.
+
+Here are some examples of prompts and their corresponding, valid SQL queries:
+
+{
+    "prompt": "Find all buildings within 500 meters of Regent's Canal.",
+    "completion": "SELECT id, geometry, height, num_floors FROM omf_building WHERE ST_DWithin( geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'Regent''s Canal' LIMIT 1), 500);"
+},
+{
+    "prompt": "Find buildings with a footprint larger than 100 square meters.",
+    "completion": "SELECT id, geometry, ST_Area(ST_Transform(geometry, 3857)) AS footprint_area_m2 FROM omf_building WHERE ST_Area(ST_Transform(geometry, 3857)) > 100;"
+},
+{
+    "prompt": "Find the nearest building to Battlebridge Basin.",
+    "completion": "SELECT id, geometry, height, num_floors, ST_Distance(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'Battlebridge Basin')) AS distance FROM omf_building ORDER BY distance LIMIT 1;"
+},
+{
+    "prompt": "Find the average height of buildings near City Road Basin within 1 kilometer.",
+    "completion": "SELECT AVG(height) AS average_height FROM omf_building WHERE ST_DWithin(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'City Road Basin'), 1000);"
+},
+{
+    "prompt": "Find all places categorized as restaurants.",
+    "completion": "SELECT id, names, geometry FROM omf_place WHERE categories::json->>'primary' = 'restaurant';"
+},
+{
+    "prompt": "Find all buildings with more than 10 floors.",
+    "completion": "SELECT id, geometry, height, num_floors FROM omf_building WHERE num_floors > 10;"
+},
+{
+    "prompt": "Find the 5 closest pubs to Regent's Canal.",
+    "completion": "WITH canal_geometry AS (SELECT ST_Union(geometry) AS geometry FROM omf_water WHERE names::json->>'primary' = 'Regent''s Canal') SELECT id, names, geometry, ST_Distance(geometry, (SELECT geometry FROM canal_geometry)) AS distance FROM omf_place WHERE categories::json->>'primary' = 'pub' ORDER BY distance LIMIT 5;"
+},
+{
+    "prompt": "Find the average distance between all buildings and the River Fleet.",
+    "completion": "SELECT AVG(ST_Distance(a.geometry, b.geometry)) AS average_distance FROM omf_building a, omf_water b WHERE b.names::json->>'primary' = 'River Fleet';"
+},
+{
+    "prompt": "List all water features where the level is below sea level.",
+    "completion": "SELECT id, geometry, names FROM omf_water WHERE level < 0;"
+},
+{
+    "prompt": "Find all buildings within 2 kilometers of the River Lee with at least 5 floors.",
+    "completion": "SELECT id, geometry, height, num_floors FROM omf_building WHERE num_floors >= 5 AND ST_DWithin(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'River Lee'), 2000);"
+},
+{
+    "prompt": "Find all pubs within 300 meters of the River Fleet.",
+    "completion": "SELECT id, names, geometry FROM omf_place WHERE categories::json->>'primary' = 'pub' AND ST_DWithin(geometry, (SELECT geometry FROM omf_water WHERE names::json->>'primary' = 'River Fleet' LIMIT 1), 300);"
+},
+{
+"prompt": "Find the centroid of the 100 largest buildings.",
+"completion": "SELECT id, ST_Centroid(geometry) AS centroid FROM omf_building ORDER BY ST_Area(ST_Transform(geometry, 3857)) DESC LIMIT 100;"
+},
+{
+    "prompt": "Find all buildings completely within 500 meters of the River Fleet.",
+    "completion": "SELECT id, geometry FROM omf_building WHERE ST_Within(geometry, (SELECT ST_Buffer(geometry, 500) FROM omf_water WHERE names::json->>'primary' = 'River Fleet' LIMIT 1));"
+},
+{
+    "prompt": "Find the buffer of 200 meters around all buildings with more than 10 floors.",
+    "completion": "SELECT id, ST_Transform(ST_Buffer(ST_Transform(geometry, 3857), 200), 4326) AS buffer FROM omf_building WHERE num_floors > 10;"
+},
+{
+    "prompt": "Find the 10 nearest restaurants to Regent's Canal.",
+    "completion": "WITH canal_geometry AS (SELECT ST_Union(geometry) AS geometry FROM omf_water WHERE names::json->>'primary' = 'Regent''s Canal') SELECT id, names, geometry, ST_Distance(geometry, (SELECT geometry FROM canal_geometry)) AS distance FROM omf_place WHERE categories::json->>'primary' = 'restaurant' ORDER BY distance LIMIT 10;"
+},
+{
+    "prompt": "Find all buildings where the centroid is within 1 kilometer of City Road Basin.",
+    "completion": "SELECT id, geometry FROM omf_building WHERE ST_DWithin(ST_Transform(ST_Centroid(geometry), 3857), (SELECT ST_Transform(geometry, 3857) FROM omf_water WHERE names::json->>'primary' = 'City Road Basin' LIMIT 1), 1000);"
+},        
+{
+    "prompt": "Find the bounding box (envelope) of all water features.",
+    "completion": "SELECT ST_Envelope(ST_Union(geometry)) AS bounding_box FROM omf_water;"
+}
+
+
+
+
 Now, generate the SQL query for the following request:
 
 "User's natural language prompt here."

@@ -1,6 +1,7 @@
 
 import openai
 import json
+import sqlparse
 
 client = openai.OpenAI()
 
@@ -8,7 +9,7 @@ client = openai.OpenAI()
 with open('gpt-prompt.md', 'r') as file:
     system_content = file.read()
 
-def fetch_sql(prompt: str):
+def fetch_sql(prompt: str, system_content: str):
     response = client.chat.completions.create(
         model="gpt-4o-2024-08-06",
         messages=[
@@ -40,18 +41,39 @@ def fetch_sql(prompt: str):
     )
     return response.choices[0].message.content
 
-with open('validate.json', 'r') as file:
-    data = json.load(file)
 
-responses = {}
-for i, item in enumerate(data):
-    print(f'Processing item {i+1} of {len(data)}:', item['prompt'])
-    response = fetch_sql(item['prompt'])
-    responses[item['prompt']] = response['sql']
-    if i > 3:
-        break
+if __name__ == '__main__':
+        
+    with open('validate.json', 'r') as file:
+        prompts = json.load(file)
 
-# save the response to a file
-with open('response.json', 'w') as file:
-    json.dump(responses, file)
+    responses = []
+    print("=============")
+    for i, item in enumerate(prompts):
+        print(f'Processing item {i+1} of {len(prompts)}:', item['prompt'])
+        
+        response = fetch_sql(item['prompt'], system_content)
+        response = json.loads(response)
+        print(response)
+        print('============')
+        sql = response['sql']
+        responses.append(response['sql'])
+    
+        formatted_query = sqlparse.format(sql, reindent=True, keyword_case="upper")
+        print(formatted_query)
+        # append to file
+        with open('experiments/responses-formatted-ex2.sql', 'a') as file:
+            file.write(formatted_query + '\n')
+        print('============')
+
+        if i > 3:
+            break
+
+
+    # save the response to a file
+    with open('experiments/responses-ex2.json', 'w') as file:
+        json.dump(responses, file)
+
+
+
 
