@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import requests
 
 import folium
@@ -36,20 +37,25 @@ col1, col2 = st.columns(2)
 # The left column: prompt + query
 with col1:
     # One shot
-    model = st.radio("Select a model", 
-                     ["gpt-4o-2024-08-06",
-                      "o1-preview-2024-09-12",
-                      "gpt-4o-mini",
-                      "o1-mini"])
+    with st.expander("Select a model"):
+        model = st.radio("Cheating with OpenAI:", 
+                         ["gpt-4o-2024-08-06",
+                          "o1-preview-2024-09-12",
+                          "gpt-4o-mini",
+                          "o1-mini"])
     
     prompt = st.text_input("Enter a prompt", 
-                           "Find all parks within 2 kilometers of Regent's Canal.")
+                           "Find the 10 nearest coffee shops to Battlebridge Basin.")
 
+    # Create containers BEFORE any dynamic content
+    button_container = st.container()
     query_display = st.container()
-    geojson_display = st.container()
     
-    if st.button("Generate query"):
-             # Run query
+    # Put the Generate Query button in its container
+    with button_container:
+        generate_button = st.button("Generate query")
+    
+    if generate_button:  # Use the button result instead of creating a new button
         @st.cache_data
         def get_query(p, m):
             return requests.post(
@@ -61,50 +67,54 @@ with col1:
         st.session_state.query_response = json.loads(q_response)['sql']
         st.session_state.show_geojson = False
 
+    # Display the Monaco editor in its container
     with query_display:
         if st.session_state.query_response:
             st.write(f"Query returned:")
-            # Display the query in an editable text area
-            st.session_state.query = sqlparse.format(st.session_state.query_response, 
-                                              reindent=True, 
-                                              keyword_case="upper")
-
-
-
+            st.session_state.query = sqlparse.format(
+                st.session_state.query_response, 
+                reindent=True, 
+                keyword_case="upper"
+            )
+            
             updated_query = st_monaco(
                 value=st.session_state.query,
                 height=300,
                 language="sql",
                 theme="vs",
             )
+            
             if updated_query:
                 st.session_state.query = updated_query
-# ---- Edited to here, let's test ----
 
-    # add a button to run the query
-    if st.button("Run query"):
+            # add a button to run the query
+            if st.button("Run query"):
 
-        # Cache this
-        @st.cache_data
-        def get_geojson(q):
-            return requests.post(
-                f"{API_URL}/query", 
-                json={"query": q})
-        
-        prepared_query = st.session_state.query_response
-        st.session_state.geojson = get_geojson(st.session_state.query).json()
-        st.session_state.show_geojson = True
-        # API call
-        with geojson_display:
-            if st.session_state.show_geojson and st.session_state.geojson:
-                st.write(f"GeoJSON returned:")
-                st.write(st.session_state.geojson)
+                # Cache this
+                @st.cache_data
+                def get_geojson(q):
+                    return requests.post(
+                        f"{API_URL}/query", 
+                        json={"query": q})
+                
+                prepared_query = st.session_state.query_response
+                st.session_state.geojson = get_geojson(st.session_state.query).json()
+                st.session_state.show_geojson = True
+                # API call
+
+
 
 # The right column: map + geospatial data
 with col2:
+
+    geojson_display = st.container()
+    with geojson_display:
+        if st.session_state.show_geojson and st.session_state.geojson:
+            st.write(f"GeoJSON returned:")
+            st.write(st.session_state.geojson)
     
-    # Pause to set up docker compose
     if st.session_state.geojson:
+
         gdf = gpd.GeoDataFrame.from_features(st.session_state.geojson["features"])
 
         # TODO: add a map
@@ -119,12 +129,100 @@ with col2:
         for _, r in gdf.iterrows():
             # Without simplifying the representation of each borough,
             # the map might not be displayed
-            sim_geo = gpd.GeoSeries(r["geometry"]).simplify(tolerance=0.001)
+            sim_geo = gpd.GeoSeries(r["geometry"])
             geo_j = sim_geo.to_json()
-            geo_j = folium.GeoJson(data=geo_j, style_function=lambda x: {"fillColor": "orange"})
 
-            geo_j.add_to(m)
+            # Create popup HTML with all non-geometry columns
+            popup_html = "<div style='width: 300px'>"
+            for col in r.index:
+                if col != 'geometry':
+                    # Format JSON columns for better readability
+                    if isinstance(r[col], (dict, list)):
+                        value = json.dumps(r[col], indent=2)
+                    else:
+                        value = r[col]
+                    popup_html += f"<b>{col}:</b> {value}<br>"
+            popup_html += "</div>"
+
+
+
+            # Get geometry type
+            geom_type = r.geometry.geom_type.lower()
+
+            if geom_type == 'point':
+                # For points, just add a CircleMarker
+                folium.CircleMarker(
+                    location=[r.geometry.y, r.geometry.x],
+                    radius=8,
+                    color="red",
+                    fill=True,
+                    fillColor="red",
+                    fillOpacity=0.7,
+                    popup=folium.Popup(popup_html, max_width=300)
+                ).add_to(m)
+            
+            elif geom_type == 'linestring':
+                # For lines, add the GeoJson with line styling
+                folium.GeoJson(
+                    data=geo_j,
+                    style_function=lambda x: {
+                        "color": "blue",
+                        "weight": 3,
+                        "opacity": 0.8
+                    },
+                    popup=folium.Popup(popup_html, max_width=300)
+                ).add_to(m)
+                
+                # Add markers at start and end points
+                coords = list(r.geometry.coords)
+                if coords:
+                    # Start point
+                    folium.CircleMarker(
+                        location=[coords[0][1], coords[0][0]],
+                        radius=4,
+                        color="green",
+                        fill=True,
+                        popup="Start"
+                    ).add_to(m)
+                    # End point
+                    folium.CircleMarker(
+                        location=[coords[-1][1], coords[-1][0]],
+                        radius=4,
+                        color="red",
+                        fill=True,
+                        popup="End"
+                    ).add_to(m)
+            
+            else:  # polygon or multipolygon
+                # Add the polygon
+                folium.GeoJson(
+                    data=geo_j,
+                    style_function=lambda x: {
+                        "fillColor": "orange",
+                        "color": "orange",
+                        "weight": 2,
+                        "fillOpacity": 0.4
+                    },
+                    popup=folium.Popup(popup_html, max_width=300)
+                ).add_to(m)
+
+                # Add a marker at the centroid
+                centroid = r.geometry.centroid
+                folium.CircleMarker(
+                    location=[centroid.y, centroid.x],
+                    radius=4,
+                    color="red",
+                    fill=True,
+                    fillColor="red",
+                    fillOpacity=0.7,
+                    popup=folium.Popup(popup_html, max_width=300)
+                ).add_to(m)
+
+
         # Fit the map to the bounding box
         m.fit_bounds([[miny, minx], [maxy, maxx]])
+
+        time.sleep(0.1)
         st_data = st_folium(m, width=725)
+        gdf
 
