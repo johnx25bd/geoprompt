@@ -43,6 +43,8 @@ def fetch_sql(prompt: str, system_content: str):
 
 
 if __name__ == '__main__':
+
+    experiment = "ex3"
         
     with open('validate.json', 'r') as file:
         prompts = json.load(file)
@@ -62,8 +64,9 @@ if __name__ == '__main__':
         formatted_query = sqlparse.format(sql, reindent=True, keyword_case="upper")
         print(formatted_query)
         # append to file
-        with open('experiments/responses-formatted-ex2.sql', 'a') as file:
+        with open(f'experiments/responses-formatted-{experiment}.sql', 'a') as file:
             file.write(formatted_query + '\n')
+            file.write('-----------------------------------\n')
         print('============')
 
         if i > 3:
@@ -71,7 +74,7 @@ if __name__ == '__main__':
 
 
     # save the response to a file
-    with open('experiments/responses-ex2.json', 'w') as file:
+    with open(f'experiments/responses-{experiment}.json', 'w') as file:
         json.dump(responses, file)
 
 

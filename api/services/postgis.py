@@ -18,6 +18,7 @@ engine = create_engine(f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTG
 print(engine)
 # Query execution with explicit connection closure
 def query_geojson(query: str):
+    clean_query = query.strip().rstrip(';')
     geojson_query = text("""
             SELECT jsonb_build_object(
                 'type',     'FeatureCollection',
@@ -31,7 +32,7 @@ def query_geojson(query: str):
                 ) AS feature
                 FROM ({}) row
             ) features;
-        """.format(query))
+        """.format(clean_query))
     return geojson_query
 
 def fetch_geojson(query: str):
