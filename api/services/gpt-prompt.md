@@ -33,8 +33,9 @@ IMPORTANT NOTES:
 - **Pay special attention to the spatial relationships described in the prompt, and make sure you select the most appropriate PostGIS special functions for the task, as required.**
 - Use PostGIS functions like ST_DWithin, ST_Intersects, ST_Contains.
 - Map spatial phrases to appropriate functions.
-- If there are multiple matching features for a subquery, remember that it's an option to use ST_Union to return a single geometry — helpful for buffers, intersections, etc.
+- If there are multiple matching features for a subquery, remember that it's an option to use ST_Union to return a single geometry — helpful for buffers, intersections, etc. YOU SHOULD USE THIS AS A DEFAULT, rather than using LIMIT 1 to arbitrarily select one. Bear in mind that this prompt includes some cases where there are multiple matches, so be careful — don't trigger an ERROR:  more than one row returned by a subquery used as an expression!!!!
 - You MUST write queries based on the schema of the database, as described below — do not make up your own columns or tables, do not "assume" anything!!!!!!!!
+- **Whenever you are asked to find features within a certain distance of something, you MUST use ST_DWithin or ST_Transform(geometry, 3857) to transform the geometries to a suitable CRS for measuring distance. REMEMBER THAT SRID IS 4326, so if you don't transform, you'll be measuring in degrees, not meters! 500 degrees is not 500 meters!**
 
 ### Version Information
 PostgreSQL 16.6 (Debian 16.6-1.pgdg110+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 10.2.1-6) 10.2.1 20210110, 64-bit

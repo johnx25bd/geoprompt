@@ -27,7 +27,7 @@ def fetch_sql(prompt: str, model="gpt-4o-2024-08-06"):
     if model not in ["gpt-4o-2024-08-06", "o1-preview-2024-09-12", "o1-mini", "gpt-4o-mini"]:
         model = "gpt-4o-2024-08-06" # fallback
     
-    print("SYSTEM CONTENT within fetch_sql", SYSTEM_CONTENT)
+    # print("SYSTEM CONTENT within fetch_sql", SYSTEM_CONTENT)
     response = client.chat.completions.create(
         model=model,
         messages=[
