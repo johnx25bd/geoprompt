@@ -1,10 +1,13 @@
 import os
+import json
 import requests
-import streamlit as st
-import geopandas as gpd
+
 import folium
+import geopandas as gpd
+import streamlit as st
 from streamlit_folium import st_folium
 from streamlit_monaco import st_monaco
+import sqlparse
 
 # Setup and config variables
 st.set_page_config(layout="wide")
@@ -17,13 +20,16 @@ API_URL = f"http://{API_HOST}:{API_PORT}"
 
 if 'geojson' not in st.session_state:
     st.session_state.geojson = None
+if 'query_response' not in st.session_state:
+    st.session_state.query_response = None
 if 'query' not in st.session_state:
     st.session_state.query = None
 if 'show_geojson' not in st.session_state:
     st.session_state.show_geojson = False
 
 # The Page
-st.title("Simple Map")
+st.title("Geoprompt")
+st.subheader("A natural language interface for geospatial databases")
 
 col1, col2 = st.columns(2)  
 
@@ -31,41 +37,49 @@ col1, col2 = st.columns(2)
 with col1:
     # One shot
     model = st.radio("Select a model", 
-                     ["gpt", 
-                      "xxx"],
-                      horizontal=True)
+                     ["gpt-4o-2024-08-06",
+                      "o1-preview-2024-09-12",
+                      "gpt-4o-mini",
+                      "o1-mini"])
     
-    # prompt = st.text_input("Query")
-    prompt = st.selectbox("Select a prompt", 
-                        ["building", "water", "places"])
+    prompt = st.text_input("Enter a prompt", 
+                           "Find all parks within 2 kilometers of Regent's Canal.")
 
     query_display = st.container()
     geojson_display = st.container()
-
-
     
     if st.button("Generate query"):
              # Run query
-        prompt_2_query_response = requests.post(
-            f"{API_URL}/prompt", 
-            json={"prompt": prompt,
-                "model": "gpt"})
-        st.session_state.query = prompt_2_query_response.json()["query"]
+        @st.cache_data
+        def get_query(p, m):
+            return requests.post(
+                f"{API_URL}/prompt", 
+                json={"prompt": p,
+                      "model": m})
+        
+        q_response = get_query(prompt, model).json()["query"]
+        st.session_state.query_response = json.loads(q_response)['sql']
         st.session_state.show_geojson = False
 
     with query_display:
-        if st.session_state.query:
+        if st.session_state.query_response:
             st.write(f"Query returned:")
             # Display the query in an editable text area
+            st.session_state.query = sqlparse.format(st.session_state.query_response, 
+                                              reindent=True, 
+                                              keyword_case="upper")
+
+
+
             updated_query = st_monaco(
                 value=st.session_state.query,
                 height=300,
                 language="sql",
-                theme="vs-dark",
+                theme="vs",
             )
             if updated_query:
                 st.session_state.query = updated_query
-
+# ---- Edited to here, let's test ----
 
     # add a button to run the query
     if st.button("Run query"):
@@ -77,6 +91,7 @@ with col1:
                 f"{API_URL}/query", 
                 json={"query": q})
         
+        prepared_query = st.session_state.query_response
         st.session_state.geojson = get_geojson(st.session_state.query).json()
         st.session_state.show_geojson = True
         # API call

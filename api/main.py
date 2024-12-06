@@ -1,6 +1,7 @@
 import logging
 from fastapi import FastAPI, HTTPException, Request
 
+from services.openai import fetch_sql
 from services.postgis import fetch_geojson
 from models.schemas import PromptRequest, QueryRequest
 
@@ -27,27 +28,11 @@ async def read_root():
 async def process_prompt(request: PromptRequest):
 
     logger.debug(f"Processing new prompt request: {request.prompt}")
-    model = request.model
+    model = request.model if request.model else "gpt-4o-2024-08-06"
 
     try:
-        # For future: using different models :P
-        # if model == "gpt":
-        #     # Call 4o API
-        #     pass
-        # elif model == "xxx":
-        #     # Call xxx API
-        #     pass
-        # else:
-        #     raise HTTPException(status_code=400, detail="Invalid model")
-    
-        query = "invalid query"
-        if request.prompt == "building":
-            query = "SELECT id, num_floors, geometry FROM omf_building LIMIT 10"
-        elif request.prompt == "water":
-            query = "SELECT id, class, geometry FROM omf_water LIMIT 10"
-        elif request.prompt == "places":
-            query = "SELECT names::json->>'primary' as name, geometry FROM omf_place LIMIT 10"
-        return {"query": query}
+        sql = fetch_sql(request.prompt, model)
+        return {"query": sql}
         
     except Exception as e:
         logger.error("Error in process_prompt", exc_info=True)

@@ -44,7 +44,7 @@ def fetch_sql(prompt: str, system_content: str):
 
 if __name__ == '__main__':
 
-    experiment = "ex3"
+    experiment = "ex4"
         
     with open('validate.json', 'r') as file:
         prompts = json.load(file)
