@@ -1,3 +1,6 @@
+## An incomplete script for automating the data download and loading process
+# This won't work out of the box, but it's heading in the right direction ...
+
 import os
 import geopandas as gpd
 import matplotlib.pyplot as plt

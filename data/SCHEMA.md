@@ -1,6 +1,6 @@
 # Collecting Schema Data
 
-We need to provide database schema data to the model so it can make predictions.
+We need to provide database schema data to the model so it can make predictions. This will become part of the prompt, so the LLM knows how to structure valid queries as its output.
 
 ## Data
 

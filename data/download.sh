@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the bounding box and output directory
-BBOX="-0.146821,51.521142,-0.052669,51.583499"
+BBOX="-0.146821,51.521142,-0.052669,51.583499" # Northeast London
 OUTPUT_DIR="data"
 FORMAT="geojson"
 
@@ -9,6 +9,7 @@ FORMAT="geojson"
 # mkdir -p $OUTPUT_DIR
 
 # List of types to download
+  # Note that for this prototype we're only using building, place and water, but we do download it all ...
 TYPES=("address" "building" "building_part" "division" "division_area" "division_boundary" "place" "segment" "connector" "infrastructure" "land" "land_cover" "land_use" "water")
 
 # Loop through each type and download the data

@@ -1,6 +1,6 @@
 # Data Processing Guide [WIP]
 
-This guide explains how to fetch, process, and store geospatial data from Overture Maps into PostGIS.
+This guide explains how to fetch, process, and store geospatial data from Overture Maps into PostGIS. This isn't an automated pipeline just yet, but it's a good starting point for anyone looking to get started with recreating the dataset, or adapting the code for other geographic regions.
 
 ## Prerequisites
 
@@ -131,5 +131,3 @@ pg_restore -h localhost -p 5433 -U mapper -d overture postgis/data/omf_islington
 - Data is persisted in a Docker volume named `pg_omf_data`
 - The dump file is stored in `postgis/data/` which is mounted into the container at `/backup/`
 ```
-
-This README provides a complete guide for your data processing workflow, including how to create and restore database dumps. Let me know if you need any clarification or have questions about specific parts!
