@@ -1,6 +1,8 @@
 services:
   api:
     build: ./api
+    env_file:
+      - .env
     # image: geoprompt-api
     # environment:
     #   - DATABASE_URL=postgres://mapper:password@postgis:5432/overture

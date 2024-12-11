@@ -1,104 +1,65 @@
-# FastAPI API Container
+# The Geoprompt API
 
-This is a containerized FastAPI project designed to quickly start building APIs with Python. The project is structured with modularity and scalability in mind, and it uses Poetry for dependency management.
+A FastAPI service that converts natural language to SQL queries for spatial data, powered by OpenAI's GPT models and PostGIS.
 
-## Project Structure
+## Quickstart
+
+1. Set up environment:
+   ```bash
+   cp .env.example .env
+   # Open .evn and add your OpenAI API key to .env
+   OPENAI_API_KEY=sk-your-key-here
+   ```
+
+2. Build and run:
+   ```bash
+   docker build -t geoprompt-api:0.1 .
+   docker run -p 8000:8000 --env-file .env geoprompt-api
+   ```
+
+3. Visit [http://localhost:8000/docs](http://localhost:8000/docs) to explore the API
+
+## API Endpoints
+
+- `POST /prompt`
+  - Converts natural language to SQL
+  - Request body: `{ "prompt": "find parks in london", "model": "gpt-4" }`
+  - Returns: `{ "query": {"sql": "SELECT ... FROM ... WHERE ..." }}`
+
+- `POST /query`
+  - Executes SQL and returns GeoJSON
+  - Request body: `{ "query": "SELECT ... FROM ..." }`
+  - Returns: GeoJSON FeatureCollection
+
+## Code Structure
 
 ```plaintext
 api/
-├── Dockerfile
-├── requirements.txt
-├── __init__.py
-├── main.py
-├── models/
-│   ├── __init__.py
-│   ├── core.py # TODO
-│   ├── HYPERPARAMETERS.py
-│   └── schemas.py
-└── services/
-    ├── __init__.py
-    └── postgis.py
+├── main.py               # FastAPI app and endpoints
+├── services/
+│   ├── openai.py         # Prompt engineering and API calls
+│   ├── gpt-prompt.md     # Prompt Markdown file
+│   └── postgis.py        # Database interactions
+└── models/
+    └── schemas.py        # Request/response models
 ```
 
-## Prerequisites
+## How It Works
 
-- Python 3.7+
-- [Poetry](https://python-poetry.org/) (for dependency management)
-- Docker (for containerization)
+1. Natural language prompts are sent to `/prompt`
+2. The prompt is processed using system prompts (in `services/openai.py`) to generate valid PostGIS SQL
+3. The SQL can be executed via `/query` to fetch spatial data in GeoJSON format
 
-## Setup Instructions
-
-### Clone the Repository
-
-### Create and Activate a Virtual Environment
-
-Poetry automatically manages virtual environments. To create and activate one, simply run:
+## Example
 
 ```bash
-poetry shell
+# Convert natural language to SQL
+curl -X POST http://localhost:8000/prompt \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "find buildings within 100m of regents canal", "model": "gpt-4o-2024-08-06"}'
+
+# Execute the returned SQL
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "SELECT ..."}'
 ```
-
-### Install Dependencies
-
-Install all necessary packages using Poetry:
-
-```bash
-poetry install
-```
-
-### Environment Variables (Optional)
-
-If your application requires environment variables, set them up in a `.env` file in the root directory.
-
-Example `.env`:
-
-```plaintext
-DATABASE_URL=postgresql://user:password@localhost/dbname
-SECRET_KEY=your_secret_key
-```
-
-## Running the Server Locally
-
-Start the FastAPI server using Uvicorn:
-
-```bash
-poetry run uvicorn main:app --reload
-```
-
-- `main:app` specifies the `app` instance in `main.py`.
-- `--reload` enables hot-reloading, useful for development.
-
-After starting the server, you should see the output indicating that it’s running at `http://127.0.0.1:8000`.
-
-## API Documentation
-
-FastAPI automatically generates interactive documentation for your API:
-
-- **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
-
-## Testing the API
-
-Once the server is running, you can test the API endpoints by visiting `http://127.0.0.1:8000/docs`, where you’ll find interactive documentation to execute requests.
-
-Alternatively, use `curl` or a tool like **Postman** to test your API endpoints.
-
-Example request with `curl`:
-
-```bash
-curl -X 'GET' \
-  'http://127.0.0.1:8000/' \
-  -H 'accept: application/json'
-```
-
-## Deployment
-
-For production, it’s recommended to run Uvicorn with a process manager like **Gunicorn** and additional workers:
-
-```bash
-gunicorn -k uvicorn.workers.UvicornWorker main:app --workers 4
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
