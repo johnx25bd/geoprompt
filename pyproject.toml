@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "nl-geospatial-interface"
+name = "mlx-geoprompt"
 version = "0.1.0"
-description = "Natural language interface for geospatial databases"
+description = "Natural language interface for geospatial databases. Capstone project, MLX5 (2024)"
 authors = ["John X <john.iv@x25bd.com>"]
 readme = "README.md"
 
