@@ -29,8 +29,12 @@ if 'show_geojson' not in st.session_state:
     st.session_state.show_geojson = False
 
 # The Page
-st.title("Geoprompt")
+st.title("Landline")
 st.subheader("A natural language interface for geospatial databases")
+st.write("""
+An LLM-powered interface for geospatial databases, powered by OpenAI and PostGIS and Overture Maps data.
+See the docs for instructions on what prompts are supported with this dataset, and the [repo on Github](https://github.com/johnx25bd/landline) for source code.
+""")
 
 col1, col2 = st.columns(2)  
 

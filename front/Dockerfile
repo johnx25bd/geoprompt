@@ -27,4 +27,4 @@ COPY . .
 EXPOSE 8501
 
 # Command to run the application
-CMD ["streamlit", "run", "app.py"]
+CMD ["streamlit", "run", "Landline.py"]

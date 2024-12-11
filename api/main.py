@@ -21,7 +21,7 @@ async def log_requests(request: Request, call_next):
 
 @app.get("/")
 async def read_root():
-    return {"message": "Welcome to the Geoprompt API. Use POST /prompt to send an prompt and receive a query, and POST /query to send a query and receive a GeoJSON response."}
+    return {"message": "Welcome to the Landline API. Use POST /prompt to send an prompt and receive a query, and POST /query to send a query and receive a GeoJSON response."}
 
 # The prompt endpoint
 @app.post("/prompt")

@@ -2,10 +2,7 @@ services:
   api:
     build: ./api
     env_file:
-      - .env
-    # image: geoprompt-api
-    # environment:
-    #   - DATABASE_URL=postgres://mapper:password@postgis:5432/overture
+      - api/.env
     ports:
       - "8000:8000"
     depends_on:
@@ -17,7 +14,6 @@ services:
 
   front:
     build: ./front
-    # image: geoprompt-front
     environment:
       - API_HOST=api
       - API_PORT=8000

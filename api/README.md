@@ -1,4 +1,4 @@
-# The Geoprompt API
+# The Landline API
 
 A FastAPI service that converts natural language to SQL queries for spatial data, powered by OpenAI's GPT models and PostGIS.
 
@@ -13,8 +13,8 @@ A FastAPI service that converts natural language to SQL queries for spatial data
 
 2. Build and run:
    ```bash
-   docker build -t geoprompt-api:0.1 .
-   docker run -p 8000:8000 --env-file .env geoprompt-api
+   docker build -t landline-api:0.1 .
+   docker run -p 8000:8000 --env-file .env landline-api
    ```
 
 3. Visit [http://localhost:8000/docs](http://localhost:8000/docs) to explore the API
