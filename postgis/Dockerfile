@@ -8,6 +8,7 @@ ENV POSTGRES_PASSWORD=password
 # Copy data to volume
 COPY ./init.sql /docker-entrypoint-initdb.d
 COPY ./init-postgis.sh /docker-entrypoint-initdb.d
+COPY ./data/omf_islington.dump /backup/omf_islington.dump
 
 RUN chmod +x /docker-entrypoint-initdb.d/init-postgis.sh
 

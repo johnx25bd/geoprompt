@@ -41,8 +41,8 @@ services:
   postgis:
     build: 
       context: ./postgis
-      platforms:
-        - linux/arm64
+      # platforms:
+      #   - linux/arm64
     ports:
       - "5432:5432"
     networks:
@@ -59,9 +59,10 @@ services:
     command: postgres
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "mapper", "-d", "overture"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
 volumes:
   pg_omf_data:
