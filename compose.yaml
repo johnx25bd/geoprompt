@@ -1,4 +1,16 @@
 services:
+
+  nginx:
+    build: ./nginx
+    image: nginx:latest
+    ports:
+      - 80:80
+    depends_on:
+      - api
+      - front
+    networks:
+      - app_network
+
   api:
     build: ./api
     env_file:
@@ -25,15 +37,6 @@ services:
       - seccomp:unconfined
     networks:
       - app_network
-
-  # nginx:
-  #   build: ./nginx
-  #   image: nginx:latest
-  #   ports:
-  #     - 80:80
-  #   depends_on:
-  #     - api
-  #     - front
 
   postgis:
     build: 
