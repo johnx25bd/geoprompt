@@ -16,3 +16,31 @@
 - **Interactive:** Explore the results directly on a map.
 - **Efficient:** Access complex geospatial insights without writing code.
 
+### **SSL Configuration**
+
+The application is configured to use HTTPS with SSL certificates from Let's Encrypt. Here's what you need to know:
+
+- **Certificate Location:** SSL certificates are stored in `/etc/letsencrypt/live/landline.world/`
+- **Auto-Renewal:** Certificates auto-renew via Certbot's systemd timer
+- **Security Features:**
+  - Forced HTTPS redirection
+  - TLS 1.2/1.3 only
+  - Strong cipher suite configuration
+  - HTTP Strict Transport Security (HSTS)
+
+#### Setting up SSL on a New Server
+
+1. Install Certbot:
+   ```bash
+   sudo apt update && sudo apt install -y certbot
+   ```
+
+2. Obtain certificate:
+   ```bash
+   sudo certbot certonly --standalone -d landline.world --email admin@landline.world --agree-tos
+   ```
+
+3. The Docker configuration automatically mounts the certificates and enables HTTPS.
+
+Note: Ensure port 80 is free when running Certbot for initial certificate acquisition and renewals.
+
