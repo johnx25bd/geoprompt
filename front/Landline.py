@@ -18,7 +18,13 @@ API_HOST = os.getenv("API_HOST", "api")  # Default to 'api' for Docker
 API_PORT = os.getenv("API_PORT", "8000")
 API_URL = f"http://{API_HOST}:{API_PORT}"
 
+# Define the data coverage bounding box
+BOUNDS_SOUTH = 51.521142
+BOUNDS_WEST = -0.146821
+BOUNDS_NORTH = 51.583499
+BOUNDS_EAST = -0.052669
 
+# Initialize session state variables
 if 'geojson' not in st.session_state:
     st.session_state.geojson = None
 if 'query_response' not in st.session_state:
@@ -27,29 +33,83 @@ if 'query' not in st.session_state:
     st.session_state.query = None
 if 'show_geojson' not in st.session_state:
     st.session_state.show_geojson = False
+if 'show_instructions' not in st.session_state:
+    st.session_state.show_instructions = True
+if 'query_error' not in st.session_state:
+    st.session_state.query_error = None
+if 'map' not in st.session_state:
+    # Center the map on the data coverage area
+    center_lat = (BOUNDS_SOUTH + BOUNDS_NORTH) / 2
+    center_lon = (BOUNDS_WEST + BOUNDS_EAST) / 2
+    initial_zoom = 12
 
-# The Page
-st.title("Landline")
-st.subheader("A natural language interface for geospatial databases")
-st.write("""
-An LLM-powered interface for geospatial databases, powered by OpenAI and PostGIS and Overture Maps data.
-
-See the docs for instructions on what prompts are supported with this dataset, and the [repo on Github](https://github.com/johnx25bd/landline) for source code. 
-
-**Note:** This is a demo — we're limited to waterways, places of interest and buildings in northeast London. But give it a try, and reach out to john@landline.world if you have any questions or suggestions.
-""")
+    # Create base map
+    m = folium.Map(location=[center_lat, center_lon], zoom_start=initial_zoom, tiles="CartoDB positron")
+    
+    # Add bounding box for data coverage
+    bounds = [[BOUNDS_SOUTH, BOUNDS_WEST], [BOUNDS_NORTH, BOUNDS_EAST]]
+    folium.Rectangle(
+        bounds=bounds,
+        color="gray",
+        weight=2,
+        fill=False,
+        popup="Data coverage area",
+        opacity=0.8
+    ).add_to(m)
+    
+    # Add layer control
+    folium.LayerControl().add_to(m)
+    
+    st.session_state.map = m
+    st.session_state.bounds = bounds
 
 col1, col2 = st.columns(2)  
 
 # The left column: prompt + query
 with col1:
-    # One shot
-    with st.expander("Select a model"):
-        model = st.radio("Cheating with OpenAI:", 
-                         ["gpt-4o-mini",
-                         "gpt-4o-2024-08-06"
-                         ])
+
+    # The Page
+    st.title("Landline")
+    st.subheader("A natural language interface for geospatial databases")
     
+    with st.expander("📖 Instructions - Click to expand", expanded=st.session_state.show_instructions):
+        st.write("""
+        An LLM-powered interface for geospatial databases, powered by OpenAI GPT-4o, PostGIS, Folium and Overture Maps data.
+
+        **Available Data:**
+        - Places of Interest (cafes, restaurants, shops, etc.)
+        - Buildings
+        - Waterways (rivers, canals)
+        
+        **Example Prompts:**
+        - "Find the 10 nearest coffee shops to Battlebridge Basin"
+        - "Show me all restaurants within 100 meters of the Regent's Canal"
+        - "Find buildings within 50 meters of any place with 'Kings Cross' in its name"
+        - "List waterways that intersect with City Road"
+
+        **Tips:**
+        - Specify numbers (e.g., "10 nearest" rather than "nearest")
+        - Use place names from northeast London
+        - For landmarks, try variations of the name (e.g., "Kings Cross", "King's Cross")
+        - Include distance metrics when relevant (meters/kilometers)
+        - Mention specific features (buildings, waterways, restaurants, etc.)
+
+        **Coverage Area:** Northeast London (King's Cross, Angel, Old Street area)
+
+        See the docs for more examples, and the [repo on Github](https://github.com/johnx25bd/landline) for source code.
+
+        Questions or suggestions? Reach out to john@landline.world
+        """)
+        if st.button("Got it!", type="primary"):
+            st.session_state.show_instructions = False
+            st.rerun()
+
+    if 'show_instructions' not in st.session_state:
+        st.session_state['show_instructions'] = True
+
+    # One shot
+    model = "gpt-4o"
+                         
     prompt = st.text_input("Enter a prompt", 
                            "Find the 10 nearest coffee shops to Battlebridge Basin.")
 
@@ -61,96 +121,120 @@ with col1:
     with button_container:
         generate_button = st.button("Generate query")
     
-    if generate_button:  # Use the button result instead of creating a new button
-        @st.cache_data
-        def get_query(p, m):
-            return requests.post(
-                f"{API_URL}/prompt", 
-                json={"prompt": p,
-                      "model": m})
-        
-        q_response = get_query(prompt, model).json()["query"]
-        st.session_state.query_response = json.loads(q_response)['sql']
-        st.session_state.show_geojson = False
+    if generate_button:
+        with st.spinner("Generating and executing query..."):
+            try:
+                # First get the SQL query
+                q_response = requests.post(
+                    f"{API_URL}/prompt", 
+                    json={"prompt": prompt,
+                          "model": model}).json()["query"]
+                st.session_state.query_response = json.loads(q_response)['sql']
+                
+                # Then immediately execute it
+                result = requests.post(
+                    f"{API_URL}/query", 
+                    json={"query": st.session_state.query_response}).json()
+                
+                # Check if we got any features back
+                if result and result.get("features") and len(result["features"]) > 0:
+                    st.session_state.geojson = result
+                    st.session_state.show_geojson = True
+                    st.session_state.query_error = None
+                else:
+                    st.session_state.geojson = None
+                    st.session_state.show_geojson = False
+                    st.session_state.query_error = "That query didn't return any results — try adjusting your prompt, or try a different location within the coverage area."
+            except Exception as e:
+                st.session_state.query_error = f"An error occurred: {str(e)}"
+                st.session_state.geojson = None
+                st.session_state.show_geojson = False
 
     # Display the Monaco editor in its container
     with query_display:
         if st.session_state.query_response:
-            st.write(f"Query returned:")
-            st.session_state.query = sqlparse.format(
-                st.session_state.query_response, 
-                reindent=True, 
-                keyword_case="upper"
-            )
-            
-            updated_query = st_monaco(
-                value=st.session_state.query,
-                height=300,
-                language="sql",
-                theme="vs",
-            )
-            
-            if updated_query:
-                st.session_state.query = updated_query
-
-            # add a button to run the query
-            if st.button("Run query"):
-
-                # Cache this
-                @st.cache_data
-                def get_geojson(q):
-                    return requests.post(
-                        f"{API_URL}/query", 
-                        json={"query": q})
+            st.write("Query returned:")
+            try:
+                formatted_sql = sqlparse.format(
+                    st.session_state.query_response, 
+                    reindent=True, 
+                    keyword_case='upper'  # lowercase 'upper' instead of 'UPPER'
+                )
                 
-                prepared_query = st.session_state.query_response
-                st.session_state.geojson = get_geojson(st.session_state.query).json()
-                st.session_state.show_geojson = True
-                # API call
+                updated_query = st_monaco(
+                    value=formatted_sql,
+                    height=300,
+                    language="sql",
+                    theme="vs",
+                )
+                
+                if updated_query:
+                    st.session_state.query = updated_query
+                
+                # Show error message after displaying the SQL
+                if st.session_state.query_error:
+                    st.error(st.session_state.query_error)
+                    
+            except Exception as e:
+                st.error(f"Error formatting SQL: {str(e)}")
+                # Still show the unformatted SQL
+                st_monaco(
+                    value=st.session_state.query_response,
+                    height=300,
+                    language="sql",
+                    theme="vs",
+                )
 
 
 
 # The right column: map + geospatial data
 with col2:
+    # Create fresh map
+    center_lat = (BOUNDS_SOUTH + BOUNDS_NORTH) / 2
+    center_lon = (BOUNDS_WEST + BOUNDS_EAST) / 2
+    initial_zoom = 12
+
+    m = folium.Map(location=[center_lat, center_lon], zoom_start=initial_zoom, tiles="CartoDB positron")
     
-    if st.session_state.geojson:
-
+    # Create feature groups
+    bounds_fg = folium.FeatureGroup(name="Coverage Area")
+    results_fg = folium.FeatureGroup(name="Query Results")
+    
+    # Add bounding box for data coverage
+    bounds = [[BOUNDS_SOUTH, BOUNDS_WEST], [BOUNDS_NORTH, BOUNDS_EAST]]
+    folium.Rectangle(
+        bounds=bounds,
+        color="gray",
+        weight=2,
+        fill=False,
+        popup="Data coverage area",
+        opacity=0.8
+    ).add_to(bounds_fg)
+    bounds_fg.add_to(m)
+    
+    # Add GeoJSON if available and not empty
+    if st.session_state.geojson and st.session_state.geojson.get("features"):
         gdf = gpd.GeoDataFrame.from_features(st.session_state.geojson["features"])
-
-        # TODO: add a map
+        
         # Compute the bounding box
         minx, miny, maxx, maxy = gdf.total_bounds
-        # Compute the center of the bounding box
-        center_lat = (miny + maxy) / 2
-        center_lon = (minx + maxx) / 2
-
-        m = folium.Map(location=[center_lat, center_lon], zoom_start=17, tiles="CartoDB positron")
 
         for _, r in gdf.iterrows():
-            # Without simplifying the representation of each borough,
-            # the map might not be displayed
             sim_geo = gpd.GeoSeries(r["geometry"])
             geo_j = sim_geo.to_json()
-
+            
             # Create popup HTML with all non-geometry columns
             popup_html = "<div style='width: 300px'>"
             for col in r.index:
                 if col != 'geometry':
-                    # Format JSON columns for better readability
-                    if isinstance(r[col], (dict, list)):
-                        value = json.dumps(r[col], indent=2)
-                    else:
-                        value = r[col]
+                    value = r[col] if not isinstance(r[col], (dict, list)) else json.dumps(r[col], indent=2)
                     popup_html += f"<b>{col}:</b> {value}<br>"
             popup_html += "</div>"
 
-
-
-            # Get geometry type
+            # Handle different geometry types
             geom_type = r.geometry.geom_type.lower()
-
+            
             if geom_type == 'point':
-                # For points, just add a CircleMarker
                 folium.CircleMarker(
                     location=[r.geometry.y, r.geometry.x],
                     radius=8,
@@ -159,10 +243,9 @@ with col2:
                     fillColor="red",
                     fillOpacity=0.7,
                     popup=folium.Popup(popup_html, max_width=300)
-                ).add_to(m)
+                ).add_to(results_fg)
             
             elif geom_type == 'linestring':
-                # For lines, add the GeoJson with line styling
                 folium.GeoJson(
                     data=geo_j,
                     style_function=lambda x: {
@@ -171,30 +254,27 @@ with col2:
                         "opacity": 0.8
                     },
                     popup=folium.Popup(popup_html, max_width=300)
-                ).add_to(m)
+                ).add_to(results_fg)
                 
                 # Add markers at start and end points
                 coords = list(r.geometry.coords)
                 if coords:
-                    # Start point
                     folium.CircleMarker(
                         location=[coords[0][1], coords[0][0]],
                         radius=4,
                         color="green",
                         fill=True,
                         popup="Start"
-                    ).add_to(m)
-                    # End point
+                    ).add_to(results_fg)
                     folium.CircleMarker(
                         location=[coords[-1][1], coords[-1][0]],
                         radius=4,
                         color="red",
                         fill=True,
                         popup="End"
-                    ).add_to(m)
+                    ).add_to(results_fg)
             
             else:  # polygon or multipolygon
-                # Add the polygon
                 folium.GeoJson(
                     data=geo_j,
                     style_function=lambda x: {
@@ -204,30 +284,34 @@ with col2:
                         "fillOpacity": 0.4
                     },
                     popup=folium.Popup(popup_html, max_width=300)
-                ).add_to(m)
+                ).add_to(results_fg)
 
-                # Add a marker at the centroid
+                # Add marker at centroid
                 centroid = r.geometry.centroid
                 folium.CircleMarker(
                     location=[centroid.y, centroid.x],
                     radius=4,
                     color="red",
                     fill=True,
-                    fillColor="red",
-                    fillOpacity=0.7,
                     popup=folium.Popup(popup_html, max_width=300)
-                ).add_to(m)
+                ).add_to(results_fg)
 
+        # Add results to map
+        results_fg.add_to(m)
+        
+        # Fit map to include both the bounding box and the GeoJSON features
+        all_bounds = [[min(miny, BOUNDS_SOUTH), min(minx, BOUNDS_WEST)], 
+                     [max(maxy, BOUNDS_NORTH), max(maxx, BOUNDS_EAST)]]
+        m.fit_bounds(all_bounds)
+    
+    # Add layer control
+    folium.LayerControl().add_to(m)
 
-        # Fit the map to the bounding box
-        m.fit_bounds([[miny, minx], [maxy, maxx]])
+    # Display the map
+    st_data = st_folium(m, width=725)
 
-        time.sleep(0.1)
-        st_data = st_folium(m, width=725)
-        gdf
-        geojson_display = st.container()
-        with geojson_display:
-            if st.session_state.show_geojson and st.session_state.geojson:
-                st.write(f"GeoJSON returned:")
-                st.write(st.session_state.geojson)
+    # Display GeoJSON data if requested
+    if st.session_state.show_geojson and st.session_state.geojson:
+        st.write("GeoJSON returned:")
+        st.write(st.session_state.geojson)
 

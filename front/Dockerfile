@@ -16,12 +16,9 @@ RUN apt-get update && \
 # Set the working directory
 WORKDIR /app
 
-# Copy the requirements file and install Python dependencies
+# Copy only the requirements file and install dependencies
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application code
-COPY . .
 
 # Expose the port that Streamlit will run on
 EXPOSE 8501
