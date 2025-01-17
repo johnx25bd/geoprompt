@@ -33,7 +33,10 @@ st.title("Landline")
 st.subheader("A natural language interface for geospatial databases")
 st.write("""
 An LLM-powered interface for geospatial databases, powered by OpenAI and PostGIS and Overture Maps data.
-See the docs for instructions on what prompts are supported with this dataset, and the [repo on Github](https://github.com/johnx25bd/landline) for source code.
+
+See the docs for instructions on what prompts are supported with this dataset, and the [repo on Github](https://github.com/johnx25bd/landline) for source code. 
+
+**Note:** This is a demo — we're limited to waterways, places of interest and buildings in northeast London. But give it a try, and reach out to john@landline.world if you have any questions or suggestions.
 """)
 
 col1, col2 = st.columns(2)  
@@ -43,10 +46,9 @@ with col1:
     # One shot
     with st.expander("Select a model"):
         model = st.radio("Cheating with OpenAI:", 
-                         ["gpt-4o-2024-08-06",
-                          "o1-preview-2024-09-12",
-                          "gpt-4o-mini",
-                          "o1-mini"])
+                         ["gpt-4o-mini",
+                         "gpt-4o-2024-08-06"
+                         ])
     
     prompt = st.text_input("Enter a prompt", 
                            "Find the 10 nearest coffee shops to Battlebridge Basin.")
@@ -110,12 +112,6 @@ with col1:
 
 # The right column: map + geospatial data
 with col2:
-
-    geojson_display = st.container()
-    with geojson_display:
-        if st.session_state.show_geojson and st.session_state.geojson:
-            st.write(f"GeoJSON returned:")
-            st.write(st.session_state.geojson)
     
     if st.session_state.geojson:
 
@@ -229,4 +225,9 @@ with col2:
         time.sleep(0.1)
         st_data = st_folium(m, width=725)
         gdf
+        geojson_display = st.container()
+        with geojson_display:
+            if st.session_state.show_geojson and st.session_state.geojson:
+                st.write(f"GeoJSON returned:")
+                st.write(st.session_state.geojson)
 
