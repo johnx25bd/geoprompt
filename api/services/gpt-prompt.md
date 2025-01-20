@@ -405,8 +405,8 @@ omf_place:
 
 
 Here are some things to watch out for:
-- We marked which columns have a json object as the value — here you will need to use the json functions to access the values, like `::json->>'primary'`
-- SRID is 4326 — this means that all geometries are in EPSG:4326. Units are degrees. If you need to transform to measure distance in meters (recommended, when relevant), use `ST_Transform(geometry, 3857)`.
+- We marked which columns have a json object as the value — here you will need to use the json functions to access the values, like `::json->>'primary'`
+- SRID is 4326 — this means that all geometries are in EPSG:4326. Units are degrees. If you need to transform to measure distance in meters (recommended, when relevant), use `ST_Transform(geometry, 3857)`.
 
 Here are some examples of prompts and their corresponding, valid SQL queries:
 
@@ -477,6 +477,46 @@ Here are some examples of prompts and their corresponding, valid SQL queries:
 {
     "prompt": "Find the bounding box (envelope) of all water features.",
     "completion": "SELECT ST_Envelope(ST_Union(geometry)) AS bounding_box FROM omf_water;"
+},
+{
+    "prompt": "Find all buildings within 50 meters of King's Cross station",
+    "completion": "WITH station AS (
+    SELECT geometry 
+    FROM omf_place 
+    WHERE categories::json->>'primary' = 'train_station'
+    AND (
+        names::json->>'primary' ILIKE '%king%cross%'
+        OR names::json->>'primary' ILIKE '%kings%cross%'
+    )
+)
+SELECT b.id, b.geometry, b.height, b.num_floors
+FROM omf_building b, station s
+WHERE ST_DWithin(
+    ST_Transform(b.geometry, 3857),
+    ST_Transform(s.geometry, 3857),
+    50
+)"
+},
+{
+    "prompt": "Find cafes near Kings Cross",
+    "completion": "WITH station AS (
+    SELECT geometry 
+    FROM omf_place 
+    WHERE categories::json->>'primary' = 'train_station'
+    AND (
+        names::json->>'primary' ILIKE '%king%cross%'
+        OR names::json->>'primary' ILIKE '%kings%cross%'
+    )
+)
+SELECT p.id, p.names, p.geometry,
+    ST_Distance(
+        ST_Transform(p.geometry, 3857),
+        ST_Transform(s.geometry, 3857)
+    ) as distance_meters
+FROM omf_place p, station s
+WHERE categories::json->>'primary' IN ('cafe', 'coffee_shop')
+ORDER BY distance_meters
+LIMIT 10"
 }
 
 
