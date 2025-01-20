@@ -11,7 +11,11 @@ from streamlit_monaco import st_monaco
 import sqlparse
 
 # Setup and config variables
-st.set_page_config(layout="wide")
+st.set_page_config(
+    layout="wide",
+    page_title="Landline Demo",
+    page_icon="☎"
+)
 
 # Get API details from environment variables, with defaults
 API_HOST = os.getenv("API_HOST", "api")  # Default to 'api' for Docker
@@ -69,18 +73,29 @@ col1, col2 = st.columns(2)
 with col1:
 
     # The Page
-    st.title("Landline")
+    st.title("Landline `Demo`")
     st.subheader("A natural language interface for geospatial databases")
     
-    with st.expander("📖 Instructions - Click to expand", expanded=st.session_state.show_instructions):
+    if 'show_instructions' not in st.session_state:
+        st.session_state.show_instructions = True
+
+    def toggle_instructions():
+        st.session_state.show_instructions = not st.session_state.show_instructions
+        
+    with st.expander("Instructions", expanded=st.session_state.show_instructions):
         st.write("""
-        An LLM-powered interface for geospatial databases, powered by OpenAI GPT-4o, PostGIS, Folium and Overture Maps data.
+        Landline is a demo LLM-powered interface for geospatial databases, powered by OpenAI GPT-4o, PostGIS, Folium and Overture Maps data.
 
         **Available Data:**
         - Places of Interest (cafes, restaurants, shops, etc.)
         - Buildings
-        - Waterways (rivers, canals)
+        - Waterways (rivers, canals)""")
         
+        subcol1, subcol2, subcol3 = st.columns([1,2,1])
+        with subcol2:
+            st.image("./assets/layers.png", width=200)
+            
+        st.write("""
         **Example Prompts:**
         - "Find the 10 nearest coffee shops to Battlebridge Basin"
         - "Show me all restaurants within 100 meters of the Regent's Canal"
@@ -93,19 +108,18 @@ with col1:
         - For landmarks, try variations of the name (e.g., "Kings Cross", "King's Cross")
         - Include distance metrics when relevant (meters/kilometers)
         - Mention specific features (buildings, waterways, restaurants, etc.)
+        - You can edit the SQL query in the editor, and run the updated query
 
-        **Coverage Area:** Northeast London (King's Cross, Angel, Old Street area)
+        **Coverage Area:** Northeast London (Kings Cross up to Stamford Hill)
+                 
+        **Note:** We don't support geocoding yet, so addresses and postcodes won't work as well as they would seem — should we build a more sophisticated agentic system?
 
         See the docs for more examples, and the [repo on Github](https://github.com/johnx25bd/landline) for source code.
 
         Questions or suggestions? Reach out to john@landline.world
         """)
-        if st.button("Got it!", type="primary"):
-            st.session_state.show_instructions = False
+        if st.button("Got it!", type="primary", on_click=toggle_instructions):
             st.rerun()
-
-    if 'show_instructions' not in st.session_state:
-        st.session_state['show_instructions'] = True
 
     # One shot
     model = "gpt-4o"
@@ -168,8 +182,28 @@ with col1:
                     theme="vs",
                 )
                 
-                if updated_query:
+                if updated_query and updated_query != formatted_sql:
                     st.session_state.query = updated_query
+                    if st.button("Run updated query"):
+                        with st.spinner("Executing updated query..."):
+                            try:
+                                result = requests.post(
+                                    f"{API_URL}/query", 
+                                    json={"query": updated_query}).json()
+                                
+                                # Check if we got any features back
+                                if result and result.get("features") and len(result["features"]) > 0:
+                                    st.session_state.geojson = result
+                                    st.session_state.show_geojson = True
+                                    st.session_state.query_error = None
+                                else:
+                                    st.session_state.geojson = None
+                                    st.session_state.show_geojson = False
+                                    st.session_state.query_error = "That query didn't return any results — try adjusting your query."
+                            except Exception as e:
+                                st.session_state.query_error = f"Error executing query: {str(e)}"
+                                st.session_state.geojson = None
+                                st.session_state.show_geojson = False
                 
                 # Show error message after displaying the SQL
                 if st.session_state.query_error:
